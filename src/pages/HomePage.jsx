@@ -2,11 +2,13 @@ import React from 'react';
 
 const HomePage = () => {
   const todo = [
-    "Establish react router (main layout, two col layout) between pages",
-    "Create login/signup form",
-    "Create dashboard tables",
-    "Design popup dialog",
-    "Establish layout for each page (Guest UserDashboard, User UserDashboard, Admin UserDashboard)"
+    'API integration for login/signup/deposit/make transfer/approve transfer/reject transfer',
+    'Redux store for user specific transactions and balance?',
+    'Redux store for all user transaction and approve/reject operation',
+    'Design dialog for deposit and transfer',
+    'Hero Section',
+    'Highlighting for active page',
+    'Admin Dashboard'
   ]
 
   return (

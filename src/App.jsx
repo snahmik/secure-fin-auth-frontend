@@ -2,14 +2,18 @@ import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import './index.css'
 import RootPage from './RootPage.jsx'
-import {createBrowserRouter} from "react-router";
+import {createBrowserRouter, Navigate} from "react-router";
 import {RouterProvider} from "react-router/dom";
 import HomePage from "./pages/HomePage.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 
-import {formAction as signupFormAction} from "./components/SignupForm.jsx";
+import SignupForm, {formAction as signupFormAction} from "./components/SignupForm.jsx";
+import LoginForm, {formAction as loginFormAction} from "./components/LoginForm.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import {Provider} from "react-redux";
+
+import store from "./store/index.js";
 
 const router = createBrowserRouter(
   [{
@@ -23,7 +27,22 @@ const router = createBrowserRouter(
       {
         path: "auth",
         element: <AuthPage/>,
-        action: signupFormAction
+        children:[
+          {
+            index: true,
+            element: <Navigate to="login"/>,
+          },
+          {
+            path: 'login',
+            element: <LoginForm method="post"/>,
+            action: loginFormAction
+          },
+          {
+            path: 'signup',
+            element: <SignupForm method="post"/>,
+            action: signupFormAction
+          },
+        ],
       },
       {
         path: 'user',
@@ -40,6 +59,8 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router}/>
+    <Provider store={store}>
+      <RouterProvider router={router}/>
+    </Provider>
   </StrictMode>,
 )

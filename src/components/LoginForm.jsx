@@ -2,8 +2,10 @@ import React from 'react';
 import {Form} from "react-router";
 import UserInput from "./UserInput.jsx";
 import Button from "./Button.jsx";
+import store, {authActions} from "../store/index.js";
 
 const LoginForm = ({method}) => {
+
   return (
     <Form method={method}
           className='flex flex-col gap-5 items-center'>
@@ -26,8 +28,10 @@ export default LoginForm;
 
 export async function formAction({request, params}) {
   const formData = await request.formData();
-
-  console.log('login')
   console.log(formData);
+
+  console.log("hihi");
+
+  store.dispatch(authActions.login({role: 'user'}))
 }
 

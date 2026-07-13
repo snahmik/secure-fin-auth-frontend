@@ -1,40 +1,47 @@
 import React from 'react';
 import StatisticalCard from "../components/StatisticalCard.jsx";
+import DataTable from "../components/DataTable.jsx";
 
 const transactions = [
   {
     date: 'Jul 10, 2026',
     description: 'Deposit',
     amount: '+$500.00',
-    type: 'income',
+    type: 'pending',
   },
   {
     date: 'Jul 9, 2026',
     description: 'Transfer from John D.',
     amount: '+$75.00',
-    type: 'income',
+    type: 'approved',
   },
   {
     date: 'Jul 9, 2026',
     description: 'Transfer to Sarah K.',
     amount: '$120.00',
-    type: 'expense',
+    type: 'rejected',
   },
   {
     date: 'Jul 8, 2026',
     description: 'Transfer to Alex M.',
     amount: '$55.00',
-    type: 'expense',
+    type: 'approved',
   },
   {
     date: 'Jul 7, 2026',
     description: 'Deposit',
     amount: '+$850.00',
-    type: 'income',
+    type: 'rejected',
   },
 ];
 
 const UserDashboard = () => {
+  const transactionTableData = {
+    headers: ["Date", "Description", "Amount", "Status"],
+    dataKeys: ["date", "description", "amount", "type"],
+    dataset: transactions,
+  }
+
   return (
     <div className='flex flex-col gap-8'>
       <section className='flex flex-col gap-1'>
@@ -68,61 +75,61 @@ const UserDashboard = () => {
       </section>
 
       <section>
-        <h2 className='text-2xl font-bold'>Recent Activity</h2>
+        <h2 className='text-2xl font-bold'>Recent Transactions</h2>
         <br/>
         <div className='p-4 shadow-md border-slate-100 rounded-xl'>
           <table className='w-full border-collapse'>
             <thead className='border-b-2'>
             <tr className='text-left text-sm font-bold uppercase tracking-wider'>
-              <th className='p-4 pt-2'>Date</th>
-              <th className='p-4 pt-2 border-l border-slate-200'>Description</th>
-              <th className='p-4 pt-2 border-l border-slate-200'>Amount</th>
-              <th className='p-4 pt-2 border-l border-slate-200'>Status</th>
+              {transactionTableData.headers.map((label,index) => {
+                const cssClass = index === 0 ? 'p-4 pt-2' : 'p-4 pt-2 border-l border-slate-200';
+                return <th key={'header' + index} className={cssClass}>{label}</th>
+              })
+              }
             </tr>
             </thead>
-
             <tbody>
-            {transactions.map((transaction,index) => {
-              const isLastEntry = index + 1 === transactions.length;
-
-              console.log(transaction.description + isLastEntry)
-
-              return (<tr className={isLastEntry? 'border-0' : 'border-b border-slate-200'}>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'}`}>{transaction.date}</td>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'} border-l border-slate-200`}>{transaction.description}</td>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'} border-l border-slate-200`}>{transaction.amount}</td>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'} border-l border-slate-200`}>{transaction.type}</td>
-              </tr>);
+            {transactionTableData.dataset.map((data,rowIndex) => {
+              const isLastEntry = rowIndex + 1 === transactionTableData.dataset.length;
+              //Remove border from bottom row
+              const rowCssClass = isLastEntry ? 'border-0': 'border-b border-slate-200';
+              let cellCssClass = isLastEntry ? 'p-4 pb-2' : 'p-4';
+              return (<tr key={'transaction-row' + rowIndex} className={rowCssClass}>
+                {transactionTableData.dataKeys.map((key,colIndex) => {
+                  //Remove border from left-most cell
+                  colIndex > 0 ? cellCssClass += ' border-l border-slate-200' : ''
+                  return <td key={'data-cell'+rowIndex+colIndex} className={cellCssClass}>{data[key]}</td>
+                })}
+              </tr>)
             })}
             </tbody>
           </table>
         </div>
-
       </section>
 
-      <section className='overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm'>
-        <h2 className='px-10 py-8 text-2xl font-bold text-[#182945]'>Recent Activity</h2>
+      {/*<section className='overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm'>*/}
+      {/*  <h2 className='px-10 py-8 text-2xl font-bold text-[#182945]'>Recent Activity</h2>*/}
 
-        <table className='w-full border-collapse'>
+      {/*  <table className='w-full border-collapse'>*/}
 
-          <tbody>
-          {transactions.map((transaction) => {
-            return (
-              <tr className='border-b border-slate-100 last:border-b-0'>
-                <td className='px-10 py-8 text-xl text-slate-500'>{transaction.date}</td>
-                <td className='px-10 py-8 text-xl font-medium text-[#182945]'>{transaction.description}</td>
-                <td className='px-10 py-8 text-xl font-bold text-teal-700'>{transaction.amount}</td>
-                <td className='px-10 py-8'>
-            <span className='inline-flex items-center rounded-ful bg-teal-50 px-5 py-2 text-lg font-medium text-teal-700'>
-              {transaction.type}
-            </span>
-                </td>
-              </tr>
-            );
-          })}
-          </tbody>
-        </table>
-      </section>
+      {/*    <tbody>*/}
+      {/*    {transactions.map((transaction) => {*/}
+      {/*      return (*/}
+      {/*        <tr className='border-b border-slate-100 last:border-b-0'>*/}
+      {/*          <td className='px-10 py-8 text-xl text-slate-500'>{transaction.date}</td>*/}
+      {/*          <td className='px-10 py-8 text-xl font-medium text-[#182945]'>{transaction.description}</td>*/}
+      {/*          <td className='px-10 py-8 text-xl font-bold text-teal-700'>{transaction.amount}</td>*/}
+      {/*          <td className='px-10 py-8'>*/}
+      {/*      <span className='inline-flex items-center rounded-ful bg-teal-50 px-5 py-2 text-lg font-medium text-teal-700'>*/}
+      {/*        {transaction.type}*/}
+      {/*      </span>*/}
+      {/*          </td>*/}
+      {/*        </tr>*/}
+      {/*      );*/}
+      {/*    })}*/}
+      {/*    </tbody>*/}
+      {/*  </table>*/}
+      {/*</section>*/}
     </div>
   );
 };
