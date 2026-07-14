@@ -2,6 +2,9 @@ import React from 'react';
 import StatisticalCard from "../components/StatisticalCard.jsx";
 import DashboardHeader from "../components/DashboardHeader.jsx";
 import UserAccountPanel from "../components/UserAccountPanel.jsx";
+import {useSelector} from "react-redux";
+import store, {userAccountActions} from "../store/index.js";
+import {useActionData, useFormAction} from "react-router";
 
 const transactions = [
   {
@@ -37,6 +40,9 @@ const transactions = [
 ];
 
 const UserDashboard = () => {
+  const accountBalance = useSelector((state) => state.userAccount.balance)
+  const formActionData = useActionData()
+
   const transactionTableData = {
     headers: ["Date", "Description", "Amount", "Status"],
     dataKeys: ["date", "description", "amount", "type"],
@@ -47,7 +53,7 @@ const UserDashboard = () => {
     <>
       <div className='flex flex-col gap-8'>
         <DashboardHeader username={'Hans'}/>
-        <UserAccountPanel/>
+        <UserAccountPanel accountBalance={accountBalance} formActionData={formActionData}/>
 
         {/*Data Summary Cards*/}
         <section className='flex gap-8 justify-around'>
@@ -104,23 +110,5 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
-
-export async function formAction({request,params}) {
-  const formData = await request.formData()
-
-  const type = formData.get('type')
-
-  if (type === 'deposit'){
-    const amount = formData.get('amount')
-
-    console.log("Deposited RM" + amount)
-    return
-  }
-
-  const recipient = formData.get('recipient')
-  const amount = formData.get('amount')
-
-  console.log("Transferred RM" + amount + " to " + recipient)
-}
 
 

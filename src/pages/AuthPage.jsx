@@ -5,7 +5,6 @@ import Card from "../components/Card.jsx";
 import {Link, NavLink, Outlet, useLocation} from "react-router";
 
 const AuthPage = () => {
-
   const location = useLocation();
   const isLoginPage = location.pathname === ('/auth/login')
 
@@ -59,3 +58,4 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
+

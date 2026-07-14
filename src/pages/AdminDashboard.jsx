@@ -35,6 +35,12 @@ const transactions = [
   },
 ];
 
+const transactionTableData = {
+  headers: ["Date", "Sender", "Recipient", "Amount", "Action"],
+  dataKeys: ["date", "description", "amount", "type",""],
+  dataset: transactions,
+}
+
 const AdminDashboard = () => {
   return (
     <div className='flex flex-col gap-8'>
@@ -53,31 +59,35 @@ const AdminDashboard = () => {
       </section>
 
       <section>
-        <h2 className='text-2xl font-bold'>Recent Activity</h2>
+        <h2 className='text-2xl font-bold'>Recent Transactions</h2>
         <br/>
-        <div className='p-4 shadow-md border-slate-100 rounded-xl'>
+        <div className='p-4 shadow-md border-slate-100 rounded-xl bg-slate-50'>
           <table className='w-full border-collapse'>
             <thead className='border-b-2'>
             <tr className='text-left text-sm font-bold uppercase tracking-wider'>
-              <th className='p-4 pt-2'>Date</th>
-              <th className='p-4 pt-2 border-l border-slate-200'>Description</th>
-              <th className='p-4 pt-2 border-l border-slate-200'>Amount</th>
-              <th className='p-4 pt-2 border-l border-slate-200'>Status</th>
+              {transactionTableData.headers.map((label, index) => {
+                const cssClass = index === 0 ? 'p-4 pt-2' : 'p-4 pt-2 border-l border-slate-200';
+                return <th key={'header' + index}
+                           className={cssClass}>{label}</th>
+              })
+              }
             </tr>
             </thead>
-
             <tbody>
-            {transactions.map((transaction,index) => {
-              const isLastEntry = index + 1 === transactions.length;
-
-              console.log(transaction.description + isLastEntry)
-
-              return (<tr className={isLastEntry? 'border-0' : 'border-b border-slate-200'}>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'}`}>{transaction.date}</td>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'} border-l border-slate-200`}>{transaction.description}</td>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'} border-l border-slate-200`}>{transaction.amount}</td>
-                <td className={`${isLastEntry? 'p-4 pb-2' : 'p-4'} border-l border-slate-200`}>{transaction.type}</td>
-              </tr>);
+            {transactionTableData.dataset.map((data, rowIndex) => {
+              const isLastEntry = rowIndex + 1 === transactionTableData.dataset.length;
+              //Remove border from bottom row
+              const rowCssClass = isLastEntry ? 'border-0' : 'border-b border-slate-200';
+              let cellCssClass = isLastEntry ? 'p-4 pb-2' : 'p-4';
+              return (<tr key={'transaction-row' + rowIndex}
+                          className={rowCssClass}>
+                {transactionTableData.dataKeys.map((key, colIndex) => {
+                  //Remove border from left-most cell
+                  colIndex > 0 ? cellCssClass += ' border-l border-slate-200' : ''
+                  return <td key={'data-cell' + rowIndex + colIndex}
+                             className={cellCssClass}>{data[key]}</td>
+                })}
+              </tr>)
             })}
             </tbody>
           </table>

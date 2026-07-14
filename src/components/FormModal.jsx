@@ -5,8 +5,7 @@ import {Form} from "react-router";
 
 const FormModal = ({
   ref,
-  confirmLabel,
-  handleConfirm,
+  confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   handleCancel,
   title,
@@ -14,6 +13,7 @@ const FormModal = ({
   method = 'post'
 }) => {
   const dialog = useRef()
+  const form = useRef()
 
   useImperativeHandle(ref, () => ({
     open: () => {
@@ -21,13 +21,14 @@ const FormModal = ({
     },
     close: () => {
       dialog.current.close()
-    }
+      form.current.reset()
+    },
   }))
 
   return (createPortal(
-      <dialog ref={dialog} className="m-auto rounded-xl px-6 py-4 shadow-md min-w-1/4 open:flex open:consum flex-col gap-2 backdrop:bg-black/60">
+      <dialog ref={dialog} onClose={handleCancel} className="m-auto rounded-xl px-6 py-4 shadow-md min-w-1/4 open:flex open:consum flex-col gap-2 backdrop:bg-black/60">
         <h3 className={'text-lg font-semibold'}>{title}</h3>
-        <Form className="flex flex-col gap-2" method={method}>
+        <Form ref={form} className="flex flex-col gap-2" method={method}>
           {children}
           <div className="flex gap-3 mt-3">
             <Button label={cancelLabel}
@@ -39,8 +40,7 @@ const FormModal = ({
             <Button label={confirmLabel}
                     buttonType="primary"
                     isOnPrimary={false}
-                    size="md"
-                    onClick={handleConfirm}/>
+                    size="md"/>
           </div>
         </Form>
       </dialog>

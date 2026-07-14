@@ -20,7 +20,29 @@ const authSlice = createSlice({
   }
 })
 
-const store = configureStore({reducer: {auth: authSlice.reducer}});
+const userAccountSlice = createSlice({
+    name: 'user',
+    initialState: {
+      balance: 1200,
+      userTransactions: []
+    },
+    reducers: {
+      deposit: (state, action) => {
+        state.balance += action.payload.amount;
+        console.log("deposit redux:")
+      },
+      transfer: (state, action) => {
+        state.balance -= action.payload.amount;
+        state.userTransactions.push(action.payload.transaction);
+        console.log("transfer redux:")
+      }
+    }
+  }
+
+)
+
+const store = configureStore({reducer: {auth: authSlice.reducer,userAccount: userAccountSlice.reducer }});
 export const authActions = authSlice.actions;
+export const userAccountActions = userAccountSlice.actions;
 export default store;
 

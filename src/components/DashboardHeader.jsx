@@ -1,9 +1,10 @@
 import React from 'react';
+import {getCurrentDayAndDate} from "../utils/dateTimeUtils.js";
 
 const DashboardHeader = ({username}) => {
   return (
     <section className='flex flex-col gap-1'>
-      <p className='text-lg text-slate-400'>Friday, July 11, 2026</p>
+      <p className='text-lg text-slate-400'>{getCurrentDayAndDate()}</p>
       <h1 className='text-3xl font-bold'>{'Welcome back,' + username}</h1>
     </section>
   );
