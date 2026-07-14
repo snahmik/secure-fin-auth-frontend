@@ -1,6 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
+@theme{
+    --color-primary: #0B1849;
+    --color-primary-hover: #1E3A8A;
+    --color-secondary: #EBEDE3;
+
+    --color-success: #124D1C;
+}
+
 html{
     margin: 0;
     padding: 0;

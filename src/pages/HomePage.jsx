@@ -7,7 +7,7 @@ const HomePage = () => {
     'Redux store for all user transaction and approve/reject operation',
     'Design dialog for deposit and transfer',
     'Hero Section',
-    'Highlighting for active page',
+    'Highlighting for active page DONE',
     'Admin Dashboard'
   ]
 

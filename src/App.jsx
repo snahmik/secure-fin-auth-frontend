@@ -9,6 +9,7 @@ import AuthPage from "./pages/AuthPage.jsx";
 
 import SignupForm, {formAction as signupFormAction} from "./components/SignupForm.jsx";
 import LoginForm, {formAction as loginFormAction} from "./components/LoginForm.jsx";
+import {formAction as userDashboardFormAction} from "./pages/UserDashboard.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import {Provider} from "react-redux";
@@ -47,6 +48,7 @@ const router = createBrowserRouter(
       {
         path: 'user',
         element: <UserDashboard/>,
+        action: userDashboardFormAction,
       },
       {
         path: 'admin',

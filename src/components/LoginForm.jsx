@@ -18,7 +18,7 @@ const LoginForm = ({method}) => {
                  name='password'
                  placeholder='Enter your password'/>
       <div className='my-2 w-3/5'>
-        <Button label="Login"/>
+        <Button label="Login" buttonType={'primary'} isOnPrimary={false} size={'md'}/>
       </div>
     </Form>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import StatisticalCard from "../components/StatisticalCard.jsx";
+import DashboardHeader from "../components/DashboardHeader.jsx";
 
 const transactions = [
   {
@@ -37,10 +38,7 @@ const transactions = [
 const AdminDashboard = () => {
   return (
     <div className='flex flex-col gap-8'>
-      <section className='flex flex-col gap-1'>
-        <p className='text-lg text-slate-400'>Friday, July 11, 2026</p>
-        <h1 className='text-3xl font-bold'>Welcome back, HANS</h1>
-      </section>
+      <DashboardHeader username={'Admin'}/>
 
       <section className='flex gap-8 justify-around'>
         <StatisticalCard dataLabel="Total Users"

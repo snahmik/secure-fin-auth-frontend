@@ -15,7 +15,7 @@ const AuthPage = () => {
   return (
     <div className='flex gap-8 w-full h-full'>
       {/*Col 1*/}
-      <div className='flex-1 flex flex-col justify-between rounded-2xl bg-gray-50 p-10 h-full'>
+      <div className='flex-1 flex flex-col justify-between rounded-2xl bg-slate-100 p-10 h-full'>
         <div className='flex flex-col gap-4'>
           <h1 className='text-4xl font-bold leading-tight text-gray-900'>
             Manage your finances with confidence.
@@ -43,7 +43,7 @@ const AuthPage = () => {
           <h2 className='text-3xl font-bold'>{title}</h2>
           <p className='text-md text-gray-400'>{subtitle}</p>
         </div>
-        <div className='flex w-3/5 bg-gray-100 rounded-md p-1'>
+        <div className='flex w-3/5 bg-slate-100 rounded-md p-1'>
           <NavLink to="/auth/login"
                    className={({isActive}) => `${isActive ? 'bg-white' : ''} flex-1 rounded-sm p-2 text-center`}>Login</NavLink>
           <NavLink to="/auth/signup"
