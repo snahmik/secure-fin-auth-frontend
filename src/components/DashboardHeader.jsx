@@ -1,5 +1,5 @@
 import React from 'react';
-import {getCurrentDayAndDate} from "../utils/dateTimeUtils.js";
+import {getCurrentDayAndDate} from "../utils/formatterUtils.js";
 
 const DashboardHeader = ({username}) => {
   return (

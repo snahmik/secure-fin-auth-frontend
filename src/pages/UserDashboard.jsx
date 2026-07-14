@@ -3,57 +3,25 @@ import StatisticalCard from "../components/StatisticalCard.jsx";
 import DashboardHeader from "../components/DashboardHeader.jsx";
 import UserAccountPanel from "../components/UserAccountPanel.jsx";
 import {useSelector} from "react-redux";
-import store, {userAccountActions} from "../store/index.js";
-import {useActionData, useFormAction} from "react-router";
-
-const transactions = [
-  {
-    date: 'Jul 10, 2026',
-    description: 'Deposit',
-    amount: '+$500.00',
-    type: 'pending',
-  },
-  {
-    date: 'Jul 9, 2026',
-    description: 'Transfer from John D.',
-    amount: '+$75.00',
-    type: 'approved',
-  },
-  {
-    date: 'Jul 9, 2026',
-    description: 'Transfer to Sarah K.',
-    amount: '$120.00',
-    type: 'rejected',
-  },
-  {
-    date: 'Jul 8, 2026',
-    description: 'Transfer to Alex M.',
-    amount: '$55.00',
-    type: 'approved',
-  },
-  {
-    date: 'Jul 7, 2026',
-    description: 'Deposit',
-    amount: '+$850.00',
-    type: 'rejected',
-  },
-];
+import {useActionData} from "react-router";
 
 const UserDashboard = () => {
-  const accountBalance = useSelector((state) => state.userAccount.balance)
+  const {balance,userTransactions} = useSelector((state) => state.userAccount)
   const formActionData = useActionData()
+
+  const isUserTransactionEmpty = userTransactions.length === 0
 
   const transactionTableData = {
     headers: ["Date", "Description", "Amount", "Status"],
-    dataKeys: ["date", "description", "amount", "type"],
-    dataset: transactions,
+    dataKeys: ["date", "description", "amount", "status"],
+    dataset: userTransactions,
   }
 
   return (
     <>
       <div className='flex flex-col gap-8'>
         <DashboardHeader username={'Hans'}/>
-        <UserAccountPanel accountBalance={accountBalance} formActionData={formActionData}/>
+        <UserAccountPanel accountBalance={balance} formActionData={formActionData}/>
 
         {/*Data Summary Cards*/}
         <section className='flex gap-8 justify-around'>
@@ -85,7 +53,8 @@ const UserDashboard = () => {
               </tr>
               </thead>
               <tbody>
-              {transactionTableData.dataset.map((data, rowIndex) => {
+              {isUserTransactionEmpty && <tr><td colSpan={4} className='text-center p-4 pb-2'>No transactions yet</td></tr>}
+              {!isUserTransactionEmpty && transactionTableData.dataset.toReversed().map((data, rowIndex) => {
                 const isLastEntry = rowIndex + 1 === transactionTableData.dataset.length;
                 //Remove border from bottom row
                 const rowCssClass = isLastEntry ? 'border-0' : 'border-b border-slate-200';
@@ -110,5 +79,3 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
-
-

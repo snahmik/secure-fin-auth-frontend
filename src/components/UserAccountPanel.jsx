@@ -4,8 +4,7 @@ import FormModal from "./FormModal.jsx";
 import UserInput from "./UserInput.jsx";
 import {formatRM} from "../utils/formatterUtils.js";
 import store, {userAccountActions} from "../store/index.js";
-import {validateEmail, validateTransferAmount, validateTransferRecipient} from "../utils/formValidationUtils.js";
-
+import {validateTransferAmount, validateTransferRecipient} from "../utils/formValidationUtils.js";
 
 const UserAccountPanel = ({accountBalance, formActionData}) => {
   const depositDialog = useRef()
@@ -120,7 +119,8 @@ const UserAccountPanel = ({accountBalance, formActionData}) => {
 
 export default UserAccountPanel;
 
-export async function formAction({request, params}) {
+export async function formAction({request}) {
+  const activeUserId = store.getState().auth.activeUserId;
   const formData = await request.formData()
 
   const type = formData.get('type')
@@ -133,27 +133,22 @@ export async function formAction({request, params}) {
   switch (type) {
     case 'deposit':
       if (error.length > 0) {
-        return {
-          success: false,
-          error
-        }
+        return {success: false, error}
       }
-      store.dispatch(userAccountActions.deposit({amount: Number(amount)}))
+
+      store.dispatch(userAccountActions.deposit({timestamp: Date.now(), sender: activeUserId, amount: Number(amount)}))
       return {success: true, type: 'deposit'}
+
     case 'transfer':
+
       const recipientAcc = formData.get('recipient')
       error.push(...validateTransferRecipient(recipientAcc))
 
       if (error.length > 0) {
-        return {
-          success: false,
-          error
-        }
+        return {success: false, error}
       }
-      const payload = {timestamp: Date.now(), recipient: recipientAcc, amount: amount, status: 'pending'}
-      store.dispatch(userAccountActions.transfer(payload))
-      console.log("Transferred RM" + amount + " to " + recipientAcc)
 
+      store.dispatch(userAccountActions.transfer({timestamp: Date.now(),sender: activeUserId,recipient: recipientAcc, amount: Number(amount)}))
       return {success: true, type: 'transfer'}
   }
 }
