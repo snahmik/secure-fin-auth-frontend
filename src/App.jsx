@@ -10,16 +10,37 @@ import AuthPage from "./pages/AuthPage.jsx";
 import SignupForm, {formAction as signupFormAction} from "./components/SignupForm.jsx";
 import LoginForm, {formAction as loginFormAction} from "./components/LoginForm.jsx";
 import {formAction as userDashboardFormAction} from "./components/UserAccountPanel.jsx";
-import UserDashboard from "./pages/UserDashboard.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx";
+import UserDashboard, {loader as userDashboardLoader} from "./pages/UserDashboard.jsx";
+import AdminDashboard, {loader as adminDashboardLoader} from "./pages/AdminDashboard.jsx";
 import {Provider} from "react-redux";
+import store, {authActions} from "./store/index.js";
+import {retrieveSession} from "./api/authApi.js";
+import ProtectedRoute from "./navigation/ProtectedRoute.jsx";
+import LogoutPage from "./pages/LogoutPage.jsx";
 
-import store from "./store/index.js";
+async function rootLoader(){
+  if (store.getState().auth.isAuthenticated) {
+    return
+  }
+
+  try{
+    const res = await retrieveSession()
+    if (res.success) {
+      const {user_id, role} = res.user
+      store.dispatch(authActions.authenticate({userId: user_id, role: role}))
+    } else {
+      store.dispatch(authActions.logout())
+    }
+  } catch (e) {
+    store.dispatch(authActions.logout())
+  }
+}
 
 const router = createBrowserRouter(
   [{
     path: "/",
     element: <RootPage/>,
+    loader: rootLoader,
     children: [
       {
         index: true,
@@ -47,13 +68,20 @@ const router = createBrowserRouter(
       },
       {
         path: 'user',
-        element: <UserDashboard/>,
+        element: <ProtectedRoute requiredRole={'user'}><UserDashboard/></ProtectedRoute>,
         action: userDashboardFormAction,
+        loader: userDashboardLoader,
+        shouldRevalidate: ({actionResult}) => actionResult?.success === true
       },
       {
         path: 'admin',
-        element: <AdminDashboard/>,
+        element: <ProtectedRoute requiredRole={'admin'}><AdminDashboard/></ProtectedRoute>,
+        loader: adminDashboardLoader,
       },
+      {
+        path: 'logout',
+        element: <LogoutPage/>
+      }
     ]
   }
   ]

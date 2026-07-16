@@ -1,14 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {Form, useActionData} from "react-router";
+import {Form, redirect, useActionData, useNavigation} from "react-router";
 import UserInput from "./UserInput.jsx";
 import Button from "./Button.jsx";
 import store, {authActions} from "../store/index.js";
 import {validateEmail, validatePassword} from "../utils/formValidationUtils.js";
+import {loginUser} from "../api/authApi.js";
 
 const LoginForm = ({method}) => {
   const formActionData = useActionData()
+  const navigation = useNavigation()
   const [emailErrors, setEmailErrors] = useState([])
   const [passwordErrors, setPasswordErrors] = useState([])
+
+  const isSubmitting = navigation.state !== 'idle'
 
   useEffect(() => {
     setEmailErrors([])
@@ -29,14 +33,19 @@ const LoginForm = ({method}) => {
       if (error.type === 'password') {
         setPasswordErrors((prevState) => [...prevState, error.message])
       }
+
+      if (error.type === 'auth') {
+        setEmailErrors((prevState) => [...prevState, error.message])
+        setPasswordErrors((prevState) => [...prevState, error.message])
+      }
     })
   }, [formActionData])
 
   return (
     <Form method={method}
-          className='flex flex-col gap-5 items-center'>
+          className='flex flex-col gap-4 items-center'>
       <UserInput label="email"
-                 type='email'
+                 type='text'
                  name='email'
                  placeholder='Enter your email'
                  errorMessages={emailErrors}
@@ -52,9 +61,10 @@ const LoginForm = ({method}) => {
                    setPasswordErrors([])
                  }}/>
       <div className='my-2 w-3/5'>
-        <Button label="Login"
-                buttonType={'primary'}
+        <Button label={isSubmitting ? 'Processing...' : 'Login'}
+                isPrimary={true}
                 isOnPrimary={false}
+                disabled={isSubmitting}
                 size={'md'}/>
       </div>
     </Form>
@@ -63,7 +73,7 @@ const LoginForm = ({method}) => {
 
 export default LoginForm;
 
-export async function formAction({request, params}) {
+export async function formAction({request}) {
   const formData = await request.formData();
 
   const email = formData.get('email')
@@ -72,7 +82,7 @@ export async function formAction({request, params}) {
   let error = []
 
   error.push(...validateEmail(email))
-  error.push(...validatePassword(password))
+  error.push(...validatePassword(password, true))
 
   if (error.length > 0) {
     return {
@@ -81,7 +91,24 @@ export async function formAction({request, params}) {
     }
   }
 
-  store.dispatch(authActions.login({role: 'user'}))
-  return {success: true}
+  try {
+    const res = await loginUser(email, password)
+
+    if (!res.success) {
+      return {success: false, error: [{type: res.error.type, message: res.error.message}]}
+    }
+
+    const {id, accountNumber, role} = res.data.user
+
+    store.dispatch(authActions.authenticate({userId: id, accountNumber: accountNumber, role: role}))
+
+    if (role === 'admin') {
+      return redirect('/admin')
+    }
+
+    return redirect(`/user`)
+  } catch (e) {
+    return {success: false, error: [{type: 'auth', message: 'An unexpected error occurred'}]}
+  }
 }
 

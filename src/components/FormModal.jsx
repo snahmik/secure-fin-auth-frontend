@@ -1,7 +1,7 @@
 import React, {useImperativeHandle, useRef} from 'react';
 import {createPortal} from "react-dom";
 import Button from "./Button.jsx";
-import {Form} from "react-router";
+import {Form, useNavigation} from "react-router";
 
 const FormModal = ({
   ref,
@@ -14,6 +14,9 @@ const FormModal = ({
 }) => {
   const dialog = useRef()
   const form = useRef()
+  const navigation = useNavigation()
+
+  const isSubmitting = navigation.state !== 'idle'
 
   useImperativeHandle(ref, () => ({
     open: () => {
@@ -31,16 +34,18 @@ const FormModal = ({
         <Form ref={form} className="flex flex-col gap-2" method={method}>
           {children}
           <div className="flex gap-3 mt-3">
-            <Button label={cancelLabel}
-                    buttonType="secondary"
+            <Button label={isSubmitting ? 'Processing...' : cancelLabel}
+                    isPrimary={false}
                     isOnPrimary={false}
                     size="md"
                     onClick={handleCancel}
-            type={'reset'}/>
-            <Button label={confirmLabel}
-                    buttonType="primary"
+                    disabled={isSubmitting}
+                    type={'reset'}/>
+            <Button label={isSubmitting ? 'Processing...' : confirmLabel}
+                    isPrimary={true}
                     isOnPrimary={false}
-                    size="md"/>
+                    size="md"
+                    disabled={isSubmitting}/>
           </div>
         </Form>
       </dialog>

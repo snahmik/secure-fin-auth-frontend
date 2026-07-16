@@ -20,11 +20,15 @@ export function validateEmail(email) {
   return errors
 }
 
-export function validatePassword(password) {
+export function validatePassword(password,isLogin = false) {
   let errors = []
 
   if(!password || password.trim() === '') {
     errors.push({type: 'password', message: 'Password is required'})
+    return errors
+  }
+
+  if (isLogin) {
     return errors
   }
 
@@ -70,7 +74,6 @@ export function validateTransferRecipient(recipientAcc) {
   }
 
   if (Number.isNaN(Number(recipientAcc))) {
-    console.log("recipientAcc is NaN")
     errors.push({type: 'transfer', message: 'Recipient account must be numeric'})
   }
 

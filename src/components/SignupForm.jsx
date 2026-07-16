@@ -1,15 +1,19 @@
 import React, {useEffect, useState} from 'react';
-import {Form, useActionData} from "react-router";
+import {Form, redirect, useActionData, useNavigation} from "react-router";
 import UserInput from "./UserInput.jsx";
 import Button from "./Button.jsx";
 import store, {authActions} from "../store/index.js";
 import {validateEmail, validateName, validatePassword} from "../utils/formValidationUtils.js";
+import {loginUser, registerUser} from "../api/authApi.js";
 
 const SignupForm = ({method}) => {
   const formActionData = useActionData()
+  const navigation = useNavigation()
   const [nameErrors, setNameErrors] = useState([])
   const [emailErrors, setEmailErrors] = useState([])
   const [passwordErrors, setPasswordErrors] = useState([])
+
+  const isSubmitting = navigation.state !== 'idle'
 
   useEffect(() => {
     setEmailErrors([])
@@ -24,12 +28,16 @@ const SignupForm = ({method}) => {
         case 'name':
           setNameErrors((prevState) => [...prevState, error.message])
           break
-        case 'email':
+        case 'username':
           setEmailErrors((prevState) => [...prevState, error.message])
           break
         case 'password':
           setPasswordErrors((prevState) => [...prevState, error.message])
           break
+        case 'auth':
+          setNameErrors((prevState) => [...prevState, error.message])
+          setEmailErrors((prevState) => [...prevState, error.message])
+          setPasswordErrors((prevState) => [...prevState, error.message])
       }
     })
   }, [formActionData]);
@@ -64,9 +72,10 @@ const SignupForm = ({method}) => {
                  }}
                  />
       <div className='my-2 w-3/5'>
-        <Button label="Sign Up"
-                buttonType={'primary'}
+        <Button label={isSubmitting ? 'Processing...' : 'Sign Up'}
+                isPrimary={true}
                 isOnPrimary={false}
+                disabled={isSubmitting}
                 size={'md'}/>
       </div>
     </Form>);
@@ -93,7 +102,23 @@ export async function formAction({request, params}) {
     }
   }
 
-  store.dispatch(authActions.login({role: 'user'}))
-  return {success: true}
+  try {
+    const res = await registerUser(name, email, password)
+
+    if (!res.success) {
+      return {success: false, error: [{type: res.error.type, message: res.error.message}]}
+    }
+
+    store.dispatch(authActions.authenticate({
+      userId: res.user.id,
+      // accountNumber: res.user.account_number,
+      role: res.user.role
+    }))
+
+    return redirect('/user')
+  } catch (e) {
+    console.log('Registration failed: ' + e)
+    return {success: false, error: [{type: 'auth', message: 'An unexpected error occurred'}]}
+  }
 }
 

@@ -41,6 +41,47 @@ export function getCurrentDateTime(dateValue = Date.now()) {
   }).format(new Date(dateValue));
 }
 
+export function formatTransactionRecord(transaction, currentUserAccountNumber) {
+  const {
+    sender_account,
+    recipient_account,
+    sender_name,
+    recipient_name,
+    amount,
+    status,
+    created_at
+  } = transaction;
+
+  const isOwnerSender = sender_account === currentUserAccountNumber;
+  const isDeposit = sender_account === recipient_account;
+  const formattedDate = getCurrentDateTime(created_at);
+
+  if (isDeposit) {
+    return {
+      date: formattedDate,
+      description: 'Deposit',
+      amount: formatRM(amount),
+      status: status
+    };
+  }
+
+  if (isOwnerSender) {
+    return {
+      date: formattedDate,
+      description: `Transfer to ${recipient_name}`,
+      amount: formatRM(-Math.abs(amount)),
+      status: status
+    };
+  }
+
+  return {
+    date: formattedDate,
+    description: `Transfer from ${sender_name}`,
+    amount: formatRM(amount),
+    status: status
+  };
+}
+
 
 
 

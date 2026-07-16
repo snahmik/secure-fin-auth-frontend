@@ -5,6 +5,7 @@ import UserInput from "./UserInput.jsx";
 import {formatRM} from "../utils/formatterUtils.js";
 import store, {userAccountActions} from "../store/index.js";
 import {validateTransferAmount, validateTransferRecipient} from "../utils/formValidationUtils.js";
+import {createTransaction, performDeposit} from "../api/transactionsApi.js";
 
 const UserAccountPanel = ({accountBalance, formActionData}) => {
   const depositDialog = useRef()
@@ -28,6 +29,8 @@ const UserAccountPanel = ({accountBalance, formActionData}) => {
     }
 
     formActionData?.error.forEach((error) => {
+
+
       switch (error?.type) {
         case 'amount':
           setAmountErrors((prevState) => [...prevState, error.message])
@@ -77,19 +80,19 @@ const UserAccountPanel = ({accountBalance, formActionData}) => {
                name={'type'}
                defaultValue={'transfer'}
                hidden/>
-        <UserInput label={'Recipient Account'}
-                   placeholder={'12345678'}
-                   name={'recipient'}
-                   errorMessages={transferErrors}
-                   onChange={() => {
-                     setTransferErrors([])
-                   }}/>
         <UserInput label={'Transfer Amount'}
                    placeholder={'RM 200'}
                    name={'amount'}
                    errorMessages={amountErrors}
                    onChange={() => {
                      setAmountErrors([])
+                   }}/>
+        <UserInput label={'Recipient Account'}
+                   placeholder={'12345678'}
+                   name={'recipient'}
+                   errorMessages={transferErrors}
+                   onChange={() => {
+                     setTransferErrors([])
                    }}/>
       </FormModal>
 
@@ -99,14 +102,14 @@ const UserAccountPanel = ({accountBalance, formActionData}) => {
         <div className='flex gap-4'>
           <div className={'w-fit'}>
             <Button label={'Perform Deposit'}
-                    buttonType={'primary'}
+                    isPrimary={true}
                     isOnPrimary={true}
                     size={'lg'}
                     onClick={() => depositDialog.current.open()}/>
           </div>
           <div className={'w-fit'}>
             <Button label={'Transfer Funds'}
-                    buttonType={'secondary'}
+                    isPrimary={false}
                     isOnPrimary={true}
                     size={'lg'}
                     onClick={() => transferDialog.current.open()}/>
@@ -120,7 +123,7 @@ const UserAccountPanel = ({accountBalance, formActionData}) => {
 export default UserAccountPanel;
 
 export async function formAction({request}) {
-  const activeUserId = store.getState().auth.activeUserId;
+  const userId = store.getState().auth.userId;
   const formData = await request.formData()
 
   const type = formData.get('type')
@@ -130,17 +133,20 @@ export async function formAction({request}) {
 
   error.push(...validateTransferAmount(amount))
 
+  if (error.length > 0) {
+    return {success: false, error}
+  }
+
   switch (type) {
     case 'deposit':
-      if (error.length > 0) {
-        return {success: false, error}
+      const deposit = await performDeposit(amount)
+
+      if (!deposit.success){
+        return {success: false, error: [deposit.error]}
       }
 
-      store.dispatch(userAccountActions.deposit({timestamp: Date.now(), sender: activeUserId, amount: Number(amount)}))
       return {success: true, type: 'deposit'}
-
     case 'transfer':
-
       const recipientAcc = formData.get('recipient')
       error.push(...validateTransferRecipient(recipientAcc))
 
@@ -148,7 +154,13 @@ export async function formAction({request}) {
         return {success: false, error}
       }
 
-      store.dispatch(userAccountActions.transfer({timestamp: Date.now(),sender: activeUserId,recipient: recipientAcc, amount: Number(amount)}))
+      const transfer = await createTransaction(recipientAcc, amount)
+
+      if (!transfer.success){
+        return {success: false, error: [transfer.error]}
+      }
+
+      // store.dispatch(userAccountActions.transfer({timestamp: Date.now(),sender: userId,recipient: recipientAcc, amount: Number(amount)}))
       return {success: true, type: 'transfer'}
   }
 }
