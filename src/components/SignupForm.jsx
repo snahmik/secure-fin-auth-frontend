@@ -16,6 +16,7 @@ const SignupForm = ({method}) => {
   const isSubmitting = navigation.state !== 'idle'
 
   useEffect(() => {
+    setNameErrors([])
     setEmailErrors([])
     setPasswordErrors([])
 
@@ -28,7 +29,7 @@ const SignupForm = ({method}) => {
         case 'name':
           setNameErrors((prevState) => [...prevState, error.message])
           break
-        case 'username':
+        case 'email':
           setEmailErrors((prevState) => [...prevState, error.message])
           break
         case 'password':
