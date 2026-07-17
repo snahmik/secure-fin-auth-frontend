@@ -36,15 +36,16 @@ export function validatePassword(password,isLogin = false) {
     errors.push({type: 'password', message: 'Password must be at least 8 characters long'})
   }
 
-  if (!password.match(/[A-Z]/) || !password.match(/[a-z]/) || !password.match(/[0-9]/)) {
+  if (!password.match(/[A-Z]/) || !password.match(/[a-z]/) || !password.match(/[0-9]/) || !password.match(/[!@#$%^&*]/)) {
     errors.push({
       type: 'password',
-      message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
     })
   }
 
   return errors
 }
+
 
 export function validateTransferAmount(amount) {
   let errors = []
